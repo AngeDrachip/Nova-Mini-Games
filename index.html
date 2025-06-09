@@ -1,119 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nova Mini-Game ✨</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova Mini-Game</title>
+
+  <!-- Favicon : logo Apple -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2285%22></text></svg>" type="image/svg+xml">
+
+  <!-- Import Polish Pro via @fontsource -->
+  <link href="https://fonts.cdnfonts.com/css/polish-pro" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <canvas id="stars"></canvas>
-  <div id="game-container">
-    <h1>Nova Mini-Game ✨</h1>
-    <div class="menu">
-      <button id="create">Créer une partie</button>
-      <input id="joinId" placeholder="Code partie" maxlength="6" />
-      <button id="join">Rejoindre</button>
-    </div>
-    <div id="status"></div>
-    <div id="board">En attente de partie...</div>
-  </div>
 
-  <script>
-    // Remplace l’URL ci-dessous par celle de ton serveur Render WebSocket
-    const socket = io('https://TON-SERVEUR-RENDER.onrender.com');
+  <header>
+    <h1 class="logo">Nova Mini-Game</h1>
+  </header>
 
-    const createBtn = document.getElementById('create');
-    const joinBtn = document.getElementById('join');
-    const joinIdInput = document.getElementById('joinId');
-    const statusDiv = document.getElementById('status');
-    const boardDiv = document.getElementById('board');
-
-    createBtn.onclick = () => {
-      socket.emit('createGame');
-      statusDiv.textContent = 'Création de la partie...';
-    };
-
-    joinBtn.onclick = () => {
-      const code = joinIdInput.value.trim().toLowerCase();
-      if (code.length === 6) {
-        socket.emit('joinGame', code);
-        statusDiv.textContent = `Connexion à la partie ${code}`;
-      } else {
-        alert('Code invalide');
-      }
-    };
-
-    socket.on('gameCreated', (gameId) => {
-      statusDiv.textContent = `Partie créée ! Code : ${gameId}`;
-    });
-
-    socket.on('startGame', ({ gameId, players }) => {
-      statusDiv.textContent = `Partie ${gameId} démarrée avec ${players.length} joueurs.`;
-      boardDiv.textContent = 'Le jeu commence ! 🎮';
-    });
-
-    socket.on('movePlayed', (move) => {
-      boardDiv.textContent = `Coup joué : ${JSON.stringify(move)}`;
-    });
-
-    socket.on('error', (msg) => {
-      alert(msg);
-      statusDiv.textContent = '';
-    });
-
-    // Bonus : étoiles en fond
-    const canvas = document.getElementById('stars');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-
-    function drawStars() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let s of stars) {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fillStyle = 'white';
-        ctx.globalAlpha = s.alpha;
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    function animateStars() {
-      for (let s of stars) {
-        s.alpha += (Math.random() - 0.5) * 0.05;
-        s.alpha = Math.min(1, Math.max(0.1, s.alpha));
-      }
-      drawStars();
-      requestAnimationFrame(animateStars);
-    }
-
-    function initStars() {
-      stars = [];
-      for (let i = 0; i < 100; i++) {
-        stars.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
-          size: Math.random() * 1.5 + 0.5,
-          alpha: Math.random()
-        });
-      }
-    }
-
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-      initStars();
-    });
-
-    resizeCanvas();
-    initStars();
-    animateStars();
-  </script>
 </body>
 </html>
